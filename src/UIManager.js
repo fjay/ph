@@ -63,7 +63,7 @@ export class UIManager {
                 tr = this.createNewRow(position, currentPrice, stockName, profit, profitRatio, suggestion);
                 tbody.appendChild(tr);
             } else {
-                this.updateExistingRow(tr, position, currentPrice, profit, profitRatio, suggestion);
+                this.updateExistingRow(tr, position, stockName, currentPrice, profit, profitRatio, suggestion);
             }
         });
 
@@ -95,7 +95,7 @@ export class UIManager {
         return tr;
     }
 
-    static updateExistingRow(tr, position, currentPrice, profit, profitRatio, suggestion) {
+    static updateExistingRow(tr, position, stockName, currentPrice, profit, profitRatio, suggestion) {
         const priceValueDiv = tr.querySelector('.price-value');
         const marketValueDiv = tr.querySelector('.market-value');
         const profitCell = tr.querySelector('td:nth-child(4)');
@@ -114,6 +114,8 @@ export class UIManager {
                     marketValueDiv.style.color = '';
                 }, 1000);
 
+                // 更新股票名称和数量
+                tr.querySelector('td:nth-child(1)').innerHTML = `<div>${stockName}</div><div style="color: #666; font-size: 12px;">${position.quantity}</div>`;
                 priceValueDiv.textContent = this.formatNumber(currentPrice);
                 marketValueDiv.textContent = this.formatNumber(position.calculateValue(currentPrice));
                 profitCell.className = profit >= 0 ? 'ph-profit-positive' : 'ph-profit-negative';

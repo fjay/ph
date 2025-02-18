@@ -5,11 +5,56 @@
 // @description  持仓管理助手
 // @author       Your name
 // @match        https://www.baidu.com
-// @grant        none
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 (function() {
     'use strict';
+
+    // 股票数据管理类
+    class StockManager {
+        constructor(symbol) {
+            this.symbol = symbol;
+        }
+
+        async fetchStockData() {
+            try {
+                return new Promise((resolve, reject) => {
+                    GM_xmlhttpRequest({
+                        method: 'GET',
+                        url: `https://hq.sinajs.cn/list=${this.symbol}`,
+                        headers: {
+                            'Referer': 'http://finance.sina.com.cn'
+                        },
+                        onload: function(response) {
+                            if (response.status === 200) {
+                                const text = response.responseText;
+                                const match = text.match(/"(.+)"/);                                
+                                if (match) {
+                                    const data = match[1].split(',');
+                                    resolve({
+                                        price: parseFloat(data[3]), // 当前价格
+                                        name: data[0] // 股票名称
+                                    });
+                                } else {
+                                    reject(new Error('无法解析股票数据'));
+                                }
+                            } else {
+                                reject(new Error(`HTTP error! status: ${response.status}`));
+                            }
+                        },
+                        onerror: function(error) {
+                            console.error('获取行情数据失败:', error);
+                            reject(error);
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('获取行情数据失败:', error);
+                return null;
+            }
+        }
+    }
 
     // 创建并注入样式
     const style = document.createElement('style');
@@ -163,7 +208,7 @@
     container.className = 'ph-container';
     container.innerHTML = `
         <div class="ph-header">
-            <button class="ph-add-btn" onclick="window.phShowAddModal()">+</button>
+            <button class="ph-add-btn" id="ph-add-btn">+</button>
         </div>
 
         <table class="ph-positions-table">
@@ -190,7 +235,7 @@
                         <input type="number" id="ph-targetRatio" required min="0" max="100" step="0.01">
                     </div>
                     <div class="ph-btn-group">
-                        <button type="button" class="ph-btn-secondary" onclick="window.phHideAddModal()">取消</button>
+                        <button type="button" class="ph-btn-secondary" id="ph-cancel-add-btn">取消</button>
                         <button type="submit" class="ph-btn-primary">确定</button>
                     </div>
                 </form>
@@ -199,7 +244,7 @@
 
         <div id="ph-edit-modal" class="ph-modal">
             <div class="ph-modal-content">
-\                <form id="ph-edit-form">
+                <form id="ph-edit-form">
                     <div class="ph-form-group">
                         <label for="ph-edit-code">代码</label>
                         <input type="text" id="ph-edit-code" required disabled>
@@ -217,7 +262,7 @@
                         <input type="number" id="ph-edit-targetRatio" required min="0" max="100" step="0.01">
                     </div>
                     <div class="ph-btn-group">
-                        <button type="button" class="ph-btn-secondary" onclick="window.phHideEditModal()">取消</button>
+                        <button type="button" class="ph-btn-secondary" id="ph-cancel-edit-btn">取消</button>
                         <button type="submit" class="ph-btn-primary">确定</button>
                     </div>
                 </form>
@@ -251,41 +296,24 @@
         document.getElementById('ph-add-form').reset();
     };
 
-    // 格式化数字为带两位小数的字符串
-    function formatNumber(number) {
-        return Number(number).toFixed(2);
-    }
+    // 显示编辑模态框
+    window.phShowEditModal = function(code) {
+        const positions = loadPositions();
+        const position = positions.find(p => p.code === code);
+        if (!position) return;
 
-    // 计算收益信息
-    function calculateProfit(position, currentPrice) {
-        const cost = position.quantity * position.cost;
-        const current = position.quantity * currentPrice;
-        const profit = current - cost;
-        const profitRatio = (profit / cost) * 100;
-        return {
-            profit,
-            profitRatio
-        };
-    }
+        document.getElementById('ph-edit-code').value = position.code;
+        document.getElementById('ph-edit-quantity').value = position.quantity;
+        document.getElementById('ph-edit-cost').value = position.cost;
+        document.getElementById('ph-edit-targetRatio').value = position.targetRatio;
+        document.getElementById('ph-edit-modal').style.display = 'block';
+    };
 
-    // 计算建议操作
-    function calculateSuggestion(positions, position, currentPrice) {
-        const totalValue = positions.reduce((sum, pos) => {
-            const price = pos === position ? currentPrice : pos.cost;
-            return sum + (pos.quantity * price);
-        }, 0);
-
-        const targetValue = totalValue * (position.targetRatio / 100);
-        const currentValue = position.quantity * currentPrice;
-        const diff = targetValue - currentValue;
-        const diffQuantity = Math.abs(Math.round(diff / currentPrice));
-
-        if (Math.abs(diff) < currentPrice) {
-            return '';
-        }
-
-        return diff > 0 ? `+ ${diffQuantity}` : `- ${diffQuantity}`;
-    }
+    // 隐藏编辑模态框
+    window.phHideEditModal = function() {
+        document.getElementById('ph-edit-modal').style.display = 'none';
+        document.getElementById('ph-edit-form').reset();
+    };
 
     // 删除持仓
     window.phDeletePosition = function(code) {
@@ -299,20 +327,23 @@
     };
 
     // 渲染持仓列表
-    function renderPositions() {
+    async function renderPositions() {
         const positions = loadPositions();
         const tbody = document.getElementById('ph-positions-body');
         tbody.innerHTML = '';
 
-        positions.forEach(position => {
-            const currentPrice = position.cost;
+        for (const position of positions) {
+            const stockManager = new StockManager(position.code);
+            const stockData = await stockManager.fetchStockData() || { price: position.cost, name: '' };
+            const currentPrice = stockData.price;
+            const stockName = stockData.name.substring(0, 3);
             const { profit, profitRatio } = calculateProfit(position, currentPrice);
             const suggestion = calculateSuggestion(positions, position, currentPrice);
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>
-                    <div>${position.code}</div>
+                    <div>${position.code} ${stockName}</div>
                     <div style="color: #666; font-size: 12px;">${position.quantity}</div>
                 </td>
                 <td>
@@ -329,12 +360,12 @@
                 </td>
                 <td>${suggestion}</td>
                 <td>
-                    <button class="ph-btn-edit" onclick="window.phShowEditModal('${position.code}')">编辑</button>
-                    <button class="ph-btn-delete" onclick="window.phDeletePosition('${position.code}')">删除</button>
+                    <button class="ph-btn-edit" data-code="${position.code}">编辑</button>
+                    <button class="ph-btn-delete" data-code="${position.code}">删除</button>
                 </td>
             `;
             tbody.appendChild(tr);
-        });
+        };
     }
 
     // 添加新持仓
@@ -426,6 +457,19 @@
     // 初始化表单事件监听
     document.getElementById('ph-add-form').addEventListener('submit', addPosition);
     document.getElementById('ph-edit-form').addEventListener('submit', editPosition);
+    document.getElementById('ph-add-btn').addEventListener('click', window.phShowAddModal);
+    document.getElementById('ph-cancel-add-btn').addEventListener('click', window.phHideAddModal);
+    document.getElementById('ph-cancel-edit-btn').addEventListener('click', window.phHideEditModal);
+
+    // 使用事件委托处理编辑和删除按钮的点击
+    document.getElementById('ph-positions-body').addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.classList.contains('ph-btn-edit')) {
+            window.phShowEditModal(target.dataset.code);
+        } else if (target.classList.contains('ph-btn-delete')) {
+            window.phDeletePosition(target.dataset.code);
+        }
+    });
 
     // 点击模态框外部时关闭
     document.getElementById('ph-add-modal').addEventListener('click', function(event) {

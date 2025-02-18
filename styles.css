@@ -1,0 +1,141 @@
+.ph-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-height: 80vh;
+    overflow-y: auto;
+    font-size: 13px;
+    max-width: 900px;
+}
+
+.ph-header {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 12px;
+}
+
+.ph-add-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.ph-positions-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+.ph-positions-table th,
+.ph-positions-table td {
+    padding: 6px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 13px;
+}
+
+.ph-positions-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.ph-positions-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.ph-profit-positive {
+    color: #f44336;
+}
+
+.ph-profit-negative {
+    color: #4CAF50;
+}
+
+.ph-btn-edit {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.ph-btn-delete {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.ph-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 10000;
+}
+
+.ph-modal-content {
+    position: relative;
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 4px;
+}
+
+.ph-form-group {
+    margin-bottom: 15px;
+}
+
+.ph-form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.ph-form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.ph-btn-group {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.ph-btn-group button {
+    margin-left: 10px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.ph-btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.ph-btn-secondary {
+    background-color: #9e9e9e;
+    color: white;
+}

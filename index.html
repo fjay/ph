@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>持仓管理助手</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="ph-container">
+        <div class="ph-header">
+            <button class="ph-add-btn" id="ph-add-btn">+</button>
+        </div>
+
+        <table class="ph-positions-table">
+            <tbody id="ph-positions-body"></tbody>
+        </table>
+
+        <div id="ph-add-modal" class="ph-modal">
+            <div class="ph-modal-content">
+                <form id="ph-add-form">
+                    <div class="ph-form-group">
+                        <label for="ph-code">代码</label>
+                        <input type="text" id="ph-code" required>
+                    </div>
+                    <div class="ph-form-group">
+                        <label for="ph-quantity">数量</label>
+                        <input type="number" id="ph-quantity" required min="0">
+                    </div>
+                    <div class="ph-form-group">
+                        <label for="ph-cost">成本价</label>
+                        <input type="number" id="ph-cost" required min="0" step="0.01">
+                    </div>
+                    <div class="ph-form-group">
+                        <label for="ph-targetRatio">目标仓位比例 (%)</label>
+                        <input type="number" id="ph-targetRatio" required min="0" max="100" step="0.01">
+                    </div>
+                    <div class="ph-btn-group">
+                        <button type="button" class="ph-btn-secondary" id="ph-cancel-add-btn">取消</button>
+                        <button type="submit" class="ph-btn-primary">确定</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="ph-edit-modal" class="ph-modal">
+            <div class="ph-modal-content">
+                <form id="ph-edit-form">
+                    <div class="ph-form-group">
+                        <label for="ph-edit-code">代码</label>
+                        <input type="text" id="ph-edit-code" required disabled>
+                    </div>
+                    <div class="ph-form-group">
+                        <label for="ph-edit-quantity">数量</label>
+                        <input type="number" id="ph-edit-quantity" required min="0">
+                    </div>
+                    <div class="ph-form-group">
+                        <label for="ph-edit-cost">成本价</label>
+                        <input type="number" id="ph-edit-cost" required min="0" step="0.01">
+                    </div>
+                    <div class="ph-form-group">
+                        <label for="ph-edit-targetRatio">目标仓位比例 (%)</label>
+                        <input type="number" id="ph-edit-targetRatio" required min="0" max="100" step="0.01">
+                    </div>
+                    <div class="ph-btn-group">
+                        <button type="button" class="ph-btn-secondary" id="ph-cancel-edit-btn">取消</button>
+                        <button type="submit" class="ph-btn-primary">确定</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="src/App.js"></script>
+</body>
+</html>

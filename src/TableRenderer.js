@@ -81,8 +81,9 @@ export class TableRenderer {
                 profitCell.className = profit >= 0 ? 'ph-profit-positive' : 'ph-profit-negative';
                 profitCell.children[0].textContent = `${UIManager.formatNumber(profitRatio)}%`;
                 profitCell.children[1].textContent = UIManager.formatNumber(profit);
-                tr.querySelector('td:nth-child(5)').innerHTML = suggestion;
             }
+            // 始终更新建议内容，不受价格变化的影响
+            tr.querySelector('td:nth-child(5)').innerHTML = suggestion;
         }
     }
 

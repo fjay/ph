@@ -20,6 +20,16 @@ export class App {
             document.getElementById('ph-import-btn').addEventListener('click', () => document.getElementById('ph-import-input').click());
             document.getElementById('ph-import-input').addEventListener('change', e => this.importPositions(e));
 
+            // 添加表格按钮的事件委托
+            document.getElementById('ph-positions-body').addEventListener('click', e => {
+                const target = e.target;
+                if (target.classList.contains('ph-btn-edit')) {
+                    this.editPosition(target.getAttribute('data-code'));
+                } else if (target.classList.contains('ph-btn-delete')) {
+                    this.deletePosition(target.getAttribute('data-code'));
+                }
+            });
+
             this.startAutoRefresh();
         });
 

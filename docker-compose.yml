@@ -1,0 +1,14 @@
+services:
+  ph:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "12381:80"
+    restart: unless-stopped
+    networks:
+      - ext_nw
+
+networks:
+  ext_nw:
+    external: true

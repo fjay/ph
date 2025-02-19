@@ -34,7 +34,7 @@ export class TableRenderer {
         const priceChange = UIManager.formatPriceChange(currentPrice, close);
         const priceChangeClass = currentPrice >= close ? 'ph-profit-positive' : 'ph-profit-negative';
         const cells = [
-            this.createCell(`<div>${stockName}</div><div class="ph-cell-secondary">${position.quantity}股 | ¥${UIManager.formatNumber(position.cost)}</div>`),
+            this.createCell(`<div>${stockName}</div><div class="ph-cell-secondary">${position.quantity} | ${UIManager.formatNumber(position.cost)}</div>`),
             this.createCell(`<div class="price-value">${UIManager.formatNumber(currentPrice)}</div><div class="price-change ${priceChangeClass}">${priceChange}</div>`),
             this.createCell(`<div class="market-value">${UIManager.formatNumber(position.calculateValue(currentPrice))}</div>`),
             this.createCell(`<div>${UIManager.formatNumber(profitRatio)}%</div><div class="ph-cell-secondary">${UIManager.formatNumber(profit)}</div>`),

@@ -76,13 +76,14 @@ export class TableRenderer {
                 const priceChangeClass = currentPrice >= close ? 'ph-profit-positive' : 'ph-profit-negative';
                 priceChangeDiv.className = `price-change ${priceChangeClass}`;
                 priceChangeDiv.textContent = UIManager.formatPriceChange(currentPrice, close);
-                const actualRatio = UIManager.calculateActualRatio(position, currentPrice, positionsData);
-                marketValueDiv.innerHTML = `<div class="market-value">${UIManager.formatNumber(position.calculateValue(currentPrice))}</div><div class="ph-cell-secondary">${UIManager.formatNumber(actualRatio)}%</div>`;
+
                 profitCell.className = profit >= 0 ? 'ph-profit-positive' : 'ph-profit-negative';
                 profitCell.children[0].textContent = `${UIManager.formatNumber(profitRatio)}%`;
                 profitCell.children[1].textContent = UIManager.formatNumber(profit);
             }
-            // 始终更新建议内容，不受价格变化的影响
+
+            const actualRatio = UIManager.calculateActualRatio(position, currentPrice, positionsData);
+            marketValueDiv.innerHTML = `<div class="market-value">${UIManager.formatNumber(position.calculateValue(currentPrice))}</div><div class="ph-cell-secondary">${UIManager.formatNumber(actualRatio)}%</div>`;
             tr.querySelector('td:nth-child(5)').innerHTML = suggestion;
         }
     }

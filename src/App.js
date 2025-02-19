@@ -20,7 +20,6 @@ export class App {
             document.getElementById('ph-import-btn').addEventListener('click', () => document.getElementById('ph-import-input').click());
             document.getElementById('ph-import-input').addEventListener('change', e => this.importPositions(e));
 
-            UIManager.renderPositions();
             this.startAutoRefresh();
         });
 

@@ -71,7 +71,7 @@ export class TableRenderer {
             const priceChanged = oldPrice !== currentPrice;
 
             if (priceChanged) {
-                tr.querySelector('td:nth-child(1)').innerHTML = `<div>${stockName}</div><div class="ph-cell-secondary">${position.quantity}股 | ¥${UIManager.formatNumber(position.cost)}</div>`;
+                tr.querySelector('td:nth-child(1)').innerHTML = `<div>${stockName}</div><div class="ph-cell-secondary">${position.quantity} | ${UIManager.formatNumber(position.cost)}</div>`;
                 priceValueDiv.textContent = UIManager.formatNumber(currentPrice);
                 const priceChangeClass = currentPrice >= close ? 'ph-profit-positive' : 'ph-profit-negative';
                 priceChangeDiv.className = `price-change ${priceChangeClass}`;

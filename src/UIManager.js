@@ -14,8 +14,8 @@ export class UIManager {
      * @param {number} number - 需要格式化的数字
      * @returns {string} 格式化后的字符串
      */
-    static formatNumber(number) {
-        return Number(number).toFixed(3);
+    static formatNumber(number, decimals = 3) {
+        return Number(number).toFixed(decimals);
     }
 
     /**
@@ -26,7 +26,7 @@ export class UIManager {
      */
     static formatPriceChange(currentPrice, closePrice) {
         const change = ((currentPrice - closePrice) / closePrice) * 100;
-        return `${change >= 0 ? '+' : ''}${this.formatNumber(change)}%`;
+        return `${change >= 0 ? '+' : ''}${this.formatNumber(change, 2)}%`;
     }
 
     /**

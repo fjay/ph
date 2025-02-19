@@ -27,23 +27,41 @@ export class TableRenderer {
      * @param {number} close - 收盘价
      * @returns {HTMLTableRowElement} 创建的表格行元素
      */
+    static #renderCellContent(position, currentPrice, stockName, profit, profitRatio, suggestion, close, positionsData = null) {
+        const priceChange = UIManager.formatPriceChange(currentPrice, close);
+        const priceChangeClass = currentPrice >= close ? 'ph-profit-positive' : 'ph-profit-negative';
+        const marketValue = UIManager.formatNumber(position.calculateValue(currentPrice), 0);
+        const actualRatio = positionsData ? UIManager.calculateActualRatio(position, currentPrice, positionsData) : null;
+
+        return {
+            firstCell: `<div>${stockName}</div><div class="ph-cell-secondary">${position.quantity} | ${UIManager.formatNumber(position.cost, 0)}</div>`,
+            priceCell: `<div class="price-value">${UIManager.formatNumber(currentPrice, 3)}</div><div class="price-change ${priceChangeClass}">${priceChange}</div>`,
+            marketCell: actualRatio
+                ? `<div class="market-value">${marketValue}</div><div class="ph-cell-secondary">${UIManager.formatNumber(actualRatio, 1)}%</div>`
+                : `<div class="market-value">${marketValue}</div>`,
+            profitCell: `<div>${UIManager.formatNumber(profitRatio, 2)}%</div><div class="ph-cell-secondary">${UIManager.formatNumber(profit, 0)}</div>`,
+            profitClass: profit >= 0 ? 'ph-profit-positive' : 'ph-profit-negative',
+            suggestionCell: suggestion,
+            actionCell: `<button class="ph-btn-edit" data-code="${position.code}">编辑</button><button class="ph-btn-delete" data-code="${position.code}">删除</button>`
+        };
+    }
+
     static createNewRow(position, currentPrice, stockName, profit, profitRatio, suggestion, close) {
         const tr = document.createElement('tr');
         tr.setAttribute('data-code', position.code);
 
-        const priceChange = UIManager.formatPriceChange(currentPrice, close);
-        const priceChangeClass = currentPrice >= close ? 'ph-profit-positive' : 'ph-profit-negative';
+        const cellContent = this.#renderCellContent(position, currentPrice, stockName, profit, profitRatio, suggestion, close);
         const cells = [
-            this.createCell(`<div>${stockName}</div><div class="ph-cell-secondary">${position.quantity} | ${UIManager.formatNumber(position.cost)}</div>`),
-            this.createCell(`<div class="price-value">${UIManager.formatNumber(currentPrice)}</div><div class="price-change ${priceChangeClass}">${priceChange}</div>`),
-            this.createCell(`<div class="market-value">${UIManager.formatNumber(position.calculateValue(currentPrice))}</div>`),
-            this.createCell(`<div>${UIManager.formatNumber(profitRatio)}%</div><div class="ph-cell-secondary">${UIManager.formatNumber(profit)}</div>`),
-            this.createCell(suggestion),
-            this.createCell(`<button class="ph-btn-edit" data-code="${position.code}">编辑</button><button class="ph-btn-delete" data-code="${position.code}">删除</button>`)
+            this.createCell(cellContent.firstCell),
+            this.createCell(cellContent.priceCell),
+            this.createCell(cellContent.marketCell),
+            this.createCell(cellContent.profitCell),
+            this.createCell(cellContent.suggestionCell),
+            this.createCell(cellContent.actionCell)
         ];
 
         cells.forEach(cell => tr.appendChild(cell));
-        tr.querySelector('td:nth-child(4)').className = profit >= 0 ? 'ph-profit-positive' : 'ph-profit-negative';
+        tr.querySelector('td:nth-child(4)').className = cellContent.profitClass;
 
         return tr;
     }
@@ -62,30 +80,19 @@ export class TableRenderer {
      */
     static updateExistingRow(tr, position, stockName, currentPrice, profit, profitRatio, suggestion, close, positionsData) {
         const priceValueDiv = tr.querySelector('.price-value');
-        const marketValueDiv = tr.querySelector('.market-value');
-        const priceChangeDiv = tr.querySelector('.price-change');
+        if (!priceValueDiv) return;
+
+        const cellContent = this.#renderCellContent(position, currentPrice, stockName, profit, profitRatio, suggestion, close, positionsData);
+
+        tr.querySelector('td:nth-child(1)').innerHTML = cellContent.firstCell;
+        priceValueDiv.parentElement.innerHTML = cellContent.priceCell;
+        tr.querySelector('.market-value').parentElement.innerHTML = cellContent.marketCell;
+
         const profitCell = tr.querySelector('td:nth-child(4)');
+        profitCell.className = cellContent.profitClass;
+        profitCell.innerHTML = cellContent.profitCell;
 
-        if (priceValueDiv) {
-            const oldPrice = parseFloat(priceValueDiv.textContent);
-            const priceChanged = oldPrice !== currentPrice;
-
-            if (priceChanged) {
-                tr.querySelector('td:nth-child(1)').innerHTML = `<div>${stockName}</div><div class="ph-cell-secondary">${position.quantity} | ${UIManager.formatNumber(position.cost)}</div>`;
-                priceValueDiv.textContent = UIManager.formatNumber(currentPrice);
-                const priceChangeClass = currentPrice >= close ? 'ph-profit-positive' : 'ph-profit-negative';
-                priceChangeDiv.className = `price-change ${priceChangeClass}`;
-                priceChangeDiv.textContent = UIManager.formatPriceChange(currentPrice, close);
-
-                profitCell.className = profit >= 0 ? 'ph-profit-positive' : 'ph-profit-negative';
-                profitCell.children[0].textContent = `${UIManager.formatNumber(profitRatio)}%`;
-                profitCell.children[1].textContent = UIManager.formatNumber(profit);
-            }
-
-            const actualRatio = UIManager.calculateActualRatio(position, currentPrice, positionsData);
-            marketValueDiv.innerHTML = `<div class="market-value">${UIManager.formatNumber(position.calculateValue(currentPrice))}</div><div class="ph-cell-secondary">${UIManager.formatNumber(actualRatio)}%</div>`;
-            tr.querySelector('td:nth-child(5)').innerHTML = suggestion;
-        }
+        tr.querySelector('td:nth-child(5)').innerHTML = cellContent.suggestionCell;
     }
 
     /**

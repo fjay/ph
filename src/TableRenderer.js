@@ -34,7 +34,7 @@ export class TableRenderer {
         const actualRatio = positionsData ? UIManager.calculateActualRatio(position, currentPrice, positionsData) : null;
 
         return {
-            firstCell: `<div>${stockName}</div><div class="ph-cell-secondary">${position.quantity} | ${UIManager.formatNumber(position.cost, 0)}</div>`,
+            firstCell: `<div>${stockName}</div><div class="ph-cell-secondary">${position.quantity} | ${UIManager.formatNumber(position.cost, 3)}</div>`,
             priceCell: `<div class="price-value">${UIManager.formatNumber(currentPrice, 3)}</div><div class="price-change ${priceChangeClass}">${priceChange}</div>`,
             marketCell: actualRatio
                 ? `<div class="market-value">${marketValue}</div><div class="ph-cell-secondary">${UIManager.formatNumber(actualRatio, 1)}%</div>`

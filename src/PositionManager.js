@@ -22,21 +22,42 @@ export class PositionManager {
         return totalRatio <= 100;
     }
 
-    static calculateSuggestion(positions, position, currentPrice) {
-        const totalValue = positions.reduce((sum, pos) => {
-            const price = pos === position ? currentPrice : pos.cost;
-            return sum + pos.calculateValue(price);
+    /**
+     * 计算建议的交易数量
+     * @param {Position[]} positions - 所有持仓数组
+     * @param {Position} position - 当前需要计算的持仓
+     * @param {number} currentPrice - 当前价格
+     * @param {Object} stockDataMap - 所有股票的最新价格数据
+     * @returns {string} 建议的交易数量，格式为 "+ 数量" 或 "- 数量"
+     */
+    static calculateSuggestion(positions, position, currentPrice, stockDataMap) {
+        // 计算当前总市值
+        const currentTotalValue = positions.reduce((sum, pos) => {
+            const price = pos === position ? currentPrice : (stockDataMap[pos.code]?.price || pos.cost);
+            return sum + pos.calculateValue(parseFloat(price));
         }, 0);
 
-        const targetValue = totalValue * (position.targetRatio / 100);
-        const currentValue = position.calculateValue(currentPrice);
-        const diff = targetValue - currentValue;
-        const diffQuantity = Math.abs(Math.round(diff / currentPrice));
+        // 根据目标仓位比例计算目标市值
+        const targetValue = currentTotalValue * (position.targetRatio / 100);
 
-        if (Math.abs(diff) < currentPrice) {
+        // 计算当前持仓的实际市值
+        const currentValue = position.calculateValue(currentPrice);
+
+        // 计算市值差额
+        const valueDiff = targetValue - currentValue;
+
+        // 如果差额太小（小于一股的价值），不给出建议
+        if (Math.abs(valueDiff) < currentPrice) {
             return '';
         }
 
-        return diff > 0 ? `+ ${diffQuantity}` : `- ${diffQuantity}`;
+        // 计算建议数量（向下取整，确保不会超过目标比例）
+        const suggestedQuantity = Math.floor(valueDiff / currentPrice);
+        const suggestedAmount = Math.abs(suggestedQuantity * currentPrice).toFixed(0);
+
+        const suggestedAmountDiv =  `<div class="ph-cell-secondary">${suggestedAmount}</div>`;
+        return suggestedQuantity > 0 ? 
+            `+ ${suggestedQuantity} ${suggestedAmountDiv}` : 
+            `- ${Math.abs(suggestedQuantity)} ${suggestedAmountDiv}`;
     }
 }

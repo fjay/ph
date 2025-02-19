@@ -88,7 +88,7 @@ export class UIManager {
             const currentPrice = parseFloat(stockData.price);
             const stockName = stockData.name.substring(0, 3);
             const { profit, profitRatio } = position.calculateProfit(currentPrice);
-            const suggestion = PositionManager.calculateSuggestion(positions, position, currentPrice);
+            const suggestion = PositionManager.calculateSuggestion(positions, position, currentPrice, stockDataMap);
             return { position, currentPrice, stockName, profit, profitRatio, suggestion, close: parseFloat(stockData.close) };
         });
 

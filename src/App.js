@@ -16,6 +16,9 @@ export class App {
             document.getElementById('ph-cancel-edit-btn').addEventListener('click', () => UIManager.hideEditModal());
             document.getElementById('ph-add-form').addEventListener('submit', e => this.addPosition(e));
             document.getElementById('ph-edit-form').addEventListener('submit', e => this.handleEditSubmit(e));
+            document.getElementById('ph-export-btn').addEventListener('click', () => this.exportPositions());
+            document.getElementById('ph-import-btn').addEventListener('click', () => document.getElementById('ph-import-input').click());
+            document.getElementById('ph-import-input').addEventListener('change', e => this.importPositions(e));
 
             UIManager.renderPositions();
             this.startAutoRefresh();
@@ -24,11 +27,43 @@ export class App {
         window.addEventListener('unload', () => this.stopAutoRefresh());
     }
 
+    exportPositions() {
+        const positions = PositionManager.load();
+        const data = JSON.stringify(positions);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'positions.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    importPositions(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                const positions = data.map(p => new Position(p.code, p.quantity, p.cost, p.targetRatio));
+                PositionManager.save(positions);
+                UIManager.renderPositions();
+                event.target.value = '';
+            } catch (error) {
+                alert('导入失败：文件格式错误');
+            }
+        };
+        reader.readAsText(file);
+    }
     startAutoRefresh() {
         if (this.refreshTimer) {
             clearInterval(this.refreshTimer);
         }
-        this.refreshTimer = setInterval(() => UIManager.renderPositions(), 5000);
+        this.refreshTimer = setInterval(() => UIManager.renderPositions(), 1000);
     }
 
     stopAutoRefresh() {

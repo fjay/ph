@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>持仓管理助手</title>
+    <title>PH</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="ph-container">
         <div class="ph-header">
             <button class="ph-add-btn" id="ph-add-btn">+</button>
+            <button class="ph-export-btn" id="ph-export-btn">导出</button>
+            <button class="ph-import-btn" id="ph-import-btn">导入</button>
+            <input type="file" id="ph-import-input" class="ph-import-input" accept=".json">
         </div>
 
         <table class="ph-positions-table">
@@ -29,7 +32,7 @@
                     </div>
                     <div class="ph-form-group">
                         <label for="ph-cost">成本价</label>
-                        <input type="number" id="ph-cost" required min="0" step="0.01">
+                        <input type="number" id="ph-cost" required min="0" step="0.001">
                     </div>
                     <div class="ph-form-group">
                         <label for="ph-targetRatio">目标仓位比例 (%)</label>
@@ -56,7 +59,7 @@
                     </div>
                     <div class="ph-form-group">
                         <label for="ph-edit-cost">成本价</label>
-                        <input type="number" id="ph-edit-cost" required min="0" step="0.01">
+                        <input type="number" id="ph-edit-cost" required min="0" step="0.001">
                     </div>
                     <div class="ph-form-group">
                         <label for="ph-edit-targetRatio">目标仓位比例 (%)</label>

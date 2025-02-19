@@ -42,7 +42,7 @@ export class TableRenderer {
             profitCell: `<div>${UIManager.formatNumber(profitRatio, 2)}%</div><div class="ph-cell-secondary">${UIManager.formatNumber(profit, 0)}</div>`,
             profitClass: profit >= 0 ? 'ph-profit-positive' : 'ph-profit-negative',
             suggestionCell: suggestion,
-            actionCell: `<button class="ph-btn-edit" data-code="${position.code}">编辑</button><button class="ph-btn-delete" data-code="${position.code}">删除</button>`
+            actionCell: `<button class="ph-btn-edit" data-code="${position.code}">E</button><button class="ph-btn-delete" data-code="${position.code}">D</button>`
         };
     }
 

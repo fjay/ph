@@ -59,7 +59,6 @@ export class App {
             try {
                 const data = JSON.parse(e.target.result);
                 const positions = data.map(p => new Position(p.code, p.quantity, p.cost, p.targetRatio));
-                localStorage.clear(); // 清空所有本地存储数据
                 PositionManager.save(positions);
                 UIManager.renderPositions();
                 event.target.value = '';
